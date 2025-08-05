@@ -5,7 +5,7 @@ dbt_packages/
 dbt_modules/
 logs/
 dbt-venv/
-
+package-lock.yml
 # Sensitive configuration files
 profiles.yml
 .dbt/

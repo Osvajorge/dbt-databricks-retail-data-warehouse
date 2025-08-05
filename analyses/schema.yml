@@ -1,0 +1,18 @@
+version: 2
+
+analyses:
+  - name: employee_performance
+    description: >
+      This analysis (`employee_performance.sql`) evaluates the performance of employees
+      based on their sales contributions and other relevant metrics. It helps identify
+      top performers and areas for improvement.
+  - name: sales_summary
+    description: >
+      This analysis (`sales_summary.sql`) provides a high-level summary of sales data,
+      including total revenue, number of orders, and average order value. It is used
+      for quick insights into overall sales trends.
+  - name: top_products
+    description: >
+      This analysis (`top_products.sql`) identifies the best-selling products based on
+      revenue or quantity sold. It helps in understanding product popularity and
+      informing inventory and marketing strategies.

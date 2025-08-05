@@ -1,0 +1,28 @@
+version: 2
+
+tests:
+  - name: fct_orders_customer_id_not_null
+    description: >
+      This test (`fct_orders_customer_id_not_null.sql`) ensures that the `customer_id`
+      column in the `fct_orders` model does not contain any null values. This is critical
+      for maintaining data integrity and ensuring that every order is associated with a customer.
+  - name: fct_orders_unique_id
+    description: >
+      This test (`fct_orders_unique_id.sql`) verifies that the `order_id` column in the
+      `fct_orders` model contains only unique values. This ensures that each order
+      record is distinct and can be uniquely identified.
+  - name: stg_customers_unique_id
+    description: >
+      This test (`stg_customers_unique_id.sql`) checks for uniqueness of the `customer_id`
+      in the `stg_customers` model. It guarantees that each customer record in the
+      staging layer is distinct.
+  - name: stg_order_items_positive_quantity
+    description: >
+      This test (`stg_order_items_positive_quantity.sql`) validates that the `quantity`
+      column in the `stg_order_items` model contains only positive values. This ensures
+      that all recorded quantities are logically valid.
+  - name: stg_orders_valid_status
+    description: >
+      This test (`stg_orders_valid_status.sql`) checks if the `status_cd` column in the
+      `stg_orders` model contains only accepted values (e.g., 'processing', 'cancelled',
+      'completed'). This maintains data quality for order statuses.

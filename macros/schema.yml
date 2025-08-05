@@ -1,0 +1,10 @@
+version: 2
+
+macros:
+  - name: generate_schema_name
+    description: >
+      This macro (`generate_schema_name`) is used to dynamically determine the schema
+      name for dbt models. If a `custom_schema_name` is provided in the model's
+      configuration, it uses that; otherwise, it defaults to the `target.schema`
+      defined in the dbt profile. This allows for flexible schema management across
+      different environments (e.g., development, staging, production).

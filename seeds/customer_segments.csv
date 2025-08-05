@@ -1,0 +1,5 @@
+segment_name,min_orders,max_orders,min_revenue,max_revenue
+New,0,1,0,99.99
+Regular,2,5,100,999.99
+VIP,6,20,1000,9999.99
+Platinum,21,999999,10000,999999999

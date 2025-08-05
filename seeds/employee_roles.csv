@@ -1,0 +1,8 @@
+job_title,role_level,can_approve_orders,max_discount_percent
+Store Manager,3,true,20
+Assistant Manager,2,true,15
+Sales Associate,1,false,10
+Warehouse Manager,3,true,0
+Regional Manager,4,true,25
+HR Manager,3,false,0
+IT Specialist,2,false,0

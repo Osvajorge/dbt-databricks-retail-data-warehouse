@@ -1,0 +1,7 @@
+status_code,status_description,is_completed,is_cancelled
+completed,Completed,true,false
+processing,In Progress,false,false
+cancelled,Cancelled,false,true
+pending,Pending Payment,false,false
+shipped,Shipped,false,false
+returned,Returned,false,true

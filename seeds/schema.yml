@@ -1,0 +1,27 @@
+version: 2
+
+seeds:
+  - name: customer_segments
+    description: >
+      This seed file (`customer_segments.csv`) contains predefined customer segments
+      used for analytical purposes. It serves as a lookup table for categorizing
+      customers based on various criteria.
+  - name: employee_roles
+    description: >
+      This seed file (`employee_roles.csv`) contains a mapping of employee roles
+      within the organization. It is used to enrich employee data and analyze
+      performance by role.
+  - name: order_status_mapping
+    description: >
+      This seed file (`order_status_mapping.csv`) provides a mapping of raw order
+      status codes to more descriptive and standardized status names. It ensures
+      consistency in order status reporting.
+  - name: product_categories
+    description: >
+      This seed file (`product_categories.csv`) contains a hierarchical classification
+      of products into different categories. It is used to enrich product data and
+      enable analysis by product category.
+  - name: store_targets
+    description: >
+      This seed file (`store_targets.csv`) defines sales targets for each store.
+      It is used to compare actual store performance against predefined goals.

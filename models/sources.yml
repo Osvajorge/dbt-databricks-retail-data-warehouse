@@ -1,0 +1,49 @@
+version: 2
+
+sources:
+  - name: bronze
+    catalog: dbt_demo
+    schema: bronze
+    description: >
+      The `bronze` layer represents the raw, untransformed data ingested directly
+      from source systems. Tables in this schema are typically exact replicas of
+      the source data, with minimal or no transformations applied. This layer
+      serves as the foundation for all subsequent data transformations and ensures
+      data lineage back to the original source.
+    tables:
+      - name: customers
+        description: >
+          Contains raw customer master data, including personal details, contact
+          information, and addresses. This table is the primary source for customer
+          information before any cleaning or standardization.
+      - name: orders
+        description: >
+          Stores raw transactional data related to customer orders, including order
+          IDs, dates, customer IDs, and overall order status. This table captures
+          the initial state of order placements.
+      - name: order_items
+        description: >
+          Details individual items within each order, linking to products and orders.
+          This table provides granular information about what was purchased in each
+          transaction, including quantities and line totals.
+      - name: products
+        description: >
+          Contains raw data for all products, including product names, categories,
+          and pricing information. This table serves as the master list of available
+          products.
+      - name: employees
+        description: >
+          Stores raw data about employees, including personal details and roles.
+          This table is used to link orders and other activities to specific employees.
+      - name: stores
+        description: >
+          Contains raw data for physical store locations, including store names
+          and addresses. This table is used to analyze performance by store.
+      - name: suppliers
+        description: >
+          Stores raw data about product suppliers, including supplier names and
+          contact details. This table provides information about the origin of products.
+      - name: dates
+        description: >
+          A raw date dimension table containing various date attributes like day,
+          month, and year. This table is used for time-based analysis and reporting.

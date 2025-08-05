@@ -1,0 +1,11 @@
+store_id,store_name,monthly_target,yearly_target
+1,Downtown Store,150000,1800000
+2,Uptown Store,120000,1440000
+3,LA Central,180000,2160000
+4,LA Beach,100000,1200000
+5,Chicago Loop,160000,1920000
+6,Houston Galleria,140000,1680000
+7,Phoenix Central,110000,1320000
+8,Online Store,300000,3600000
+9,Warehouse East,0,0
+10,Warehouse West,0,0

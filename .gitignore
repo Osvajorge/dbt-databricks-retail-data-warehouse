@@ -1,0 +1,11 @@
+
+# dbt-related directories and files
+target/
+dbt_packages/
+dbt_modules/
+logs/
+dbt-venv/
+
+# Sensitive configuration files
+profiles.yml
+.dbt/

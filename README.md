@@ -35,7 +35,7 @@ This project demonstrates the implementation of a complete data warehouse for a 
 
 ## 🏗️ Architecture
 
-### Medallion Architecture Flow
+### Medallion Architecture Overview
 
 ```mermaid
 graph TD
@@ -101,114 +101,93 @@ graph TD
 
 ## 📊 Data Model
 
-### Entity Relationship Diagram
+### Star Schema Design
 
-Our data model follows a classic retail pattern with the following entities and relationships:
+Our data model follows a classic retail star schema pattern with comprehensive dimensions and facts:
 
 ```mermaid
 erDiagram
-    SUPPLIERS {
-        int supplier_id PK
-        varchar supplier_name
-        varchar contact_person
-        varchar email
-        varchar phone
-        varchar address
-        varchar city
-        varchar state
-        varchar zip_code
-        timestamp updated_at
-    }
-    
-    DATES {
+    dim_dates {
         date date_id PK
-        varchar day
         varchar month
-        varchar year
-        int quarter
         varchar day_of_week
-        int week_of_year
-        timestamp updated_at
+        varchar season
+        varchar shopping_season
+        varchar quarter_name
+        boolean is_weekend
     }
     
-    STORES {
+    dim_customers {
+        int customer_id PK
+        varchar customer_name
+        varchar email
+        varchar value_segment
+        varchar activity_status
+        varchar region
+        decimal lifetime_revenue
+        int total_orders
+    }
+    
+    dim_products {
+        int product_id PK
+        varchar product_name
+        varchar category
+        varchar category_group
+        varchar price_tier
+        varchar product_status
+        decimal retail_price
+        decimal margin_percent
+    }
+    
+    dim_employees {
+        int employee_id PK
+        varchar employee_name
+        varchar department
+        varchar tenure_category
+        varchar performance_tier
+        varchar job_title
+        int manager_id
+    }
+    
+    dim_stores {
         int store_id PK
         varchar store_name
-        varchar address
-        varchar city
-        varchar state
-        varchar zip_code
-        varchar email
-        varchar phone
-        timestamp updated_at
+        varchar store_type
+        varchar region
+        varchar operating_status
+        decimal monthly_target
+        varchar performance_status
     }
     
-    CUSTOMERS {
-        int customer_id PK
-        varchar first_name
-        varchar last_name
-        varchar email
-        varchar phone
-        varchar address
-        varchar city
-        varchar state
-        varchar zip_code
-        timestamp updated_at
+    dim_suppliers {
+        int supplier_id PK
+        varchar supplier_name
+        varchar supplier_tier
+        varchar region
+        int total_products
+        varchar portfolio_diversity
     }
     
-    EMPLOYEES {
-        int employee_id PK
-        varchar first_name
-        varchar last_name
-        varchar email
-        varchar job_title
-        date hire_date
-        int manager_id FK
-        varchar address
-        varchar city
-        varchar state
-        varchar zip_code
-        timestamp updated_at
-    }
-    
-    PRODUCTS {
-        int product_id PK
-        varchar name
-        varchar category
-        decimal retail_price
-        decimal supplier_price
-        int supplier_id FK
-        timestamp updated_at
-    }
-    
-    ORDERS {
+    fct_orders {
         int order_id PK
-        date order_date
+        date order_date FK
         int customer_id FK
         int employee_id FK
         int store_id FK
-        varchar status
-        timestamp updated_at
-    }
-    
-    ORDER_ITEMS {
-        int order_item_id PK
-        int order_id FK
-        int product_id FK
-        int quantity
-        decimal unit_price
-        timestamp updated_at
+        varchar status_desc
+        decimal revenue
+        int item_count
+        int total_quantity
     }
 
     %% Relationships
-    SUPPLIERS ||--o{ PRODUCTS : supplies
-    CUSTOMERS ||--o{ ORDERS : places
-    EMPLOYEES ||--o{ ORDERS : processes
-    EMPLOYEES ||--o{ EMPLOYEES : reports_to
-    STORES ||--o{ ORDERS : receives
-    DATES ||--o{ ORDERS : order_date
-    ORDERS ||--o{ ORDER_ITEMS : contains
-    PRODUCTS ||--o{ ORDER_ITEMS : included_in
+    dim_dates ||--o{ fct_orders : order_date
+    dim_customers ||--o{ fct_orders : customer_id
+    dim_employees ||--o{ fct_orders : employee_id
+    dim_stores ||--o{ fct_orders : store_id
+    dim_suppliers ||--o{ dim_products : supplier_id
+    dim_products ||--o{ fct_orders : "via order_items"
+    dim_employees ||--o{ dim_employees : "reports_to"
 ```
 
 ### 🥇 Gold Layer (Marts)
@@ -242,18 +221,32 @@ The following diagram shows the complete dbt lineage from bronze tables through 
 
 ```mermaid
 flowchart LR
-    subgraph Bronze["🥉 Bronze Layer"]
-        customers[customers]
-        orders[orders]
-        order_items[order_items]
-        products[products]
-        employees[employees]
-        stores[stores]
-        suppliers[suppliers]
-        dates[dates]
+    %% Bronze Layer
+    subgraph Bronze ["🥉 Bronze Tables"]
+        direction TB
+        customers[(customers)]
+        orders[(orders)]
+        order_items[(order_items)]
+        products[(products)]
+        employees[(employees)]
+        stores[(stores)]
+        suppliers[(suppliers)]
+        dates[(dates)]
     end
     
-    subgraph Silver["🥈 Silver Layer"]
+    %% Seeds
+    subgraph Seeds ["🌱 Reference Data"]
+        direction TB
+        cs[customer_segments]
+        er[employee_roles] 
+        pc[product_categories]
+        st[store_targets]
+        osm[order_status_mapping]
+    end
+    
+    %% Silver Layer
+    subgraph Silver ["🥈 Staging Models"]
+        direction TB
         stg_customers[stg_customers]
         stg_orders[stg_orders]
         stg_order_items[stg_order_items]
@@ -264,33 +257,27 @@ flowchart LR
         stg_dates[stg_dates]
     end
     
-    subgraph Gold["🥇 Gold Layer"]
-        subgraph Core["Core Dimensions & Facts"]
-            dim_customers[dim_customers]
-            dim_products[dim_products]
-            dim_employees[dim_employees]
-            dim_stores[dim_stores]
-            dim_suppliers[dim_suppliers]
-            dim_dates[dim_dates]
-            fct_orders[fct_orders]
-        end
-        
-        subgraph Finance["Finance Marts"]
-            fct_customer_segmentation[fct_customer_segmentation]
-            fct_store_performance[fct_store_performance]
-            fct_store_monthly_profit[fct_store_monthly_profit]
-        end
+    %% Gold Layer - Dimensions
+    subgraph Dimensions ["📊 Dimensions"]
+        direction TB
+        dim_customers[dim_customers]
+        dim_products[dim_products]
+        dim_employees[dim_employees]
+        dim_stores[dim_stores]
+        dim_suppliers[dim_suppliers]
+        dim_dates[dim_dates]
     end
     
-    subgraph Seeds["🌱 Seeds"]
-        customer_segments[customer_segments]
-        employee_roles[employee_roles]
-        product_categories[product_categories]
-        store_targets[store_targets]
-        order_status_mapping[order_status_mapping]
+    %% Gold Layer - Facts
+    subgraph Facts ["📈 Fact Tables"]
+        direction TB
+        fct_orders[fct_orders]
+        fct_segmentation[fct_customer_segmentation]
+        fct_performance[fct_store_performance]
+        fct_profit[fct_store_monthly_profit]
     end
     
-    %% Bronze to Silver
+    %% Connections Bronze to Silver
     customers --> stg_customers
     orders --> stg_orders
     order_items --> stg_order_items
@@ -300,7 +287,7 @@ flowchart LR
     suppliers --> stg_suppliers
     dates --> stg_dates
     
-    %% Silver to Gold - Dimensions
+    %% Connections Silver to Gold Dimensions
     stg_customers --> dim_customers
     stg_products --> dim_products
     stg_employees --> dim_employees
@@ -308,25 +295,35 @@ flowchart LR
     stg_suppliers --> dim_suppliers
     stg_dates --> dim_dates
     
-    %% Silver to Gold - Facts
+    %% Seeds to Dimensions
+    cs --> dim_customers
+    er --> dim_employees
+    pc --> dim_products
+    st --> dim_stores
+    osm --> stg_orders
+    
+    %% Silver to Facts
     stg_orders --> fct_orders
     stg_order_items --> fct_orders
     
-    %% Seeds to Dimensions
-    customer_segments --> dim_customers
-    employee_roles --> dim_employees
-    product_categories --> dim_products
-    store_targets --> dim_stores
-    order_status_mapping --> stg_orders
+    %% Dimensions to Facts
+    dim_customers --> fct_segmentation
+    dim_stores --> fct_performance
+    dim_stores --> fct_profit
+    fct_orders --> fct_segmentation
+    fct_orders --> fct_performance
+    fct_orders --> fct_profit
     
-    %% Facts to Finance Marts
-    fct_orders --> fct_customer_segmentation
-    fct_orders --> fct_store_performance
-    fct_orders --> fct_store_monthly_profit
-    dim_customers --> fct_customer_segmentation
-    dim_stores --> fct_store_performance
-    customer_segments --> fct_customer_segmentation
-    store_targets --> fct_store_performance
+    %% Styling
+    classDef bronze fill:#8B4513,stroke:#654321,stroke-width:2px,color:#fff
+    classDef silver fill:#A9A9A9,stroke:#696969,stroke-width:2px,color:#000
+    classDef gold fill:#FFD700,stroke:#B8860B,stroke-width:2px,color:#000
+    classDef seed fill:#90EE90,stroke:#32CD32,stroke-width:2px,color:#000
+    
+    class customers,orders,order_items,products,employees,stores,suppliers,dates bronze
+    class stg_customers,stg_orders,stg_order_items,stg_products,stg_employees,stg_stores,stg_suppliers,stg_dates silver
+    class dim_customers,dim_products,dim_employees,dim_stores,dim_suppliers,dim_dates,fct_orders,fct_segmentation,fct_performance,fct_profit gold
+    class cs,er,pc,st,osm seed
 ```
 
 ## 🚀 Setup & Installation
@@ -446,6 +443,19 @@ dbt run --select state:modified
 dbt run --full-refresh
 ```
 
+### Development Commands
+
+```bash
+# Incremental mode for development
+dbt run --select marts.core --vars '{is_test: true}'
+
+# Clean
+dbt clean
+
+# Compile without running
+dbt compile
+```
+
 ## 📖 Documentation
 
 ### Interactive Documentation
@@ -473,5 +483,79 @@ To visualize lineage in Databricks:
 3. Use **Lineage** tab for dependency visualization
 4. Leverage **Query Profile** for performance analysis
 
+<<<<<<< HEAD
 ---
 *Built with ❤️ using dbt and Databricks*
+=======
+### Project Structure
+
+```
+dbt-databricks-analytics/
+├── 📁 models/
+│   ├── 📁 staging/              # 🥈 Silver Layer - Clean data
+│   │   ├── stg_customers.sql
+│   │   ├── stg_orders.sql
+│   │   ├── stg_products.sql
+│   │   └── ...
+│   └── 📁 marts/               # 🥇 Gold Layer - Business-ready
+│       ├── 📁 core/            # Main dimensions and facts
+│       │   ├── dim_customers.sql
+│       │   ├── dim_products.sql
+│       │   ├── fct_orders.sql
+│       │   └── ...
+│       └── 📁 finance/         # Financial metrics
+│           ├── fct_customer_segmentation.sql
+│           ├── fct_store_performance.sql
+│           └── ...
+├── 📁 seeds/                   # Reference data
+├── 📁 tests/                   # Data quality tests
+├── 📁 analyses/               # Ad-hoc analyses
+├── 📁 macros/                 # Reusable code
+└── 📁 setup/                  # Initial setup scripts
+```
+
+## 🔍 Tests & Data Quality
+
+### Automated Tests
+
+The project includes comprehensive tests to ensure data quality:
+
+- **Schema Tests**: `unique`, `not_null`, `accepted_values`, `relationships`
+- **Singular Tests**: Business logic specific validations
+- **dbt_utils Tests**: `at_least_one` for important metrics
+
+### Running Tests
+
+```bash
+# All tests
+dbt test
+
+# Specific tests
+dbt test --select staging
+dbt test --select marts.core
+
+# Tests with data storage
+dbt test --store-failures
+```
+
+## 📈 Available Analyses
+
+### Pre-built Analyses
+
+| Analysis | File | Description |
+|----------|---------|-------------|
+| **Top Products** | `analyses/top_products.sql` | Best-selling products by quantity and revenue |
+| **Employee Performance** | `analyses/employee_performance.sql` | Employee performance by sales |
+| **Sales Summary** | `analyses/sales_summary.sql` | Monthly sales summary by store |
+
+### Running Analyses
+
+```bash
+# Compile analyses
+dbt compile --select analyses
+
+# View compiled results in target/compiled/dbt_demo/analyses/
+```
+
+*Built with ❤️ using dbt and Databricks*
+>>>>>>> f77c376 (Update README)

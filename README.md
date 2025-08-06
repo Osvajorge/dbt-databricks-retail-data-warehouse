@@ -38,17 +38,13 @@ This project demonstrates the implementation of a complete data warehouse for a 
 ### Medallion Architecture Flow
 
 ```mermaid
-flowchart TD
-    ---
-config:
-  theme: redux
----
 graph TD
     subgraph Sources ["📥 Data Sources"]
         S1[Raw CSV Files]
         S2[Database Extracts] 
         S3[API Data]
     end
+    
     subgraph Bronze ["🥉 Bronze Layer - Raw Data"]
         B1[(customers)]
         B2[(orders)]
@@ -59,6 +55,7 @@ graph TD
         B7[(suppliers)]
         B8[(dates)]
     end
+    
     subgraph Silver ["🥈 Silver Layer - Cleaned Data"]
         C1[stg_customers]
         C2[stg_orders]
@@ -69,6 +66,7 @@ graph TD
         C7[stg_suppliers]
         C8[stg_dates]
     end
+    
     subgraph Gold ["🥇 Gold Layer - Business Ready"]
         direction TB
         subgraph Dimensions ["📊 Dimensions"]
@@ -85,18 +83,20 @@ graph TD
             F3[fct_store_performance]
         end
     end
+    
     Sources --> Bronze
     Bronze --> Silver
     Silver --> Gold
+    
     classDef bronze fill:#cd853f,stroke:#8b4513,stroke-width:2px,color:#fff
     classDef silver fill:#c0c0c0,stroke:#696969,stroke-width:2px,color:#000
     classDef gold fill:#ffd700,stroke:#daa520,stroke-width:2px,color:#000
     classDef source fill:#98fb98,stroke:#228b22,stroke-width:2px,color:#000
+    
     class B1,B2,B3,B4,B5,B6,B7,B8 bronze
-    class C1,C2,C3,C4,C5,C6,C7,C8 silver
+    class C1,C2,C3,C4,C5,C6,C7,C8 silver  
     class D1,D2,D3,D4,D5,D6,F1,F2,F3 gold
     class S1,S2,S3 source
-    end
 ```
 
 ## 📊 Data Model

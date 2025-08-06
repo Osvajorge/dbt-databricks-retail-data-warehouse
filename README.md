@@ -99,97 +99,6 @@ graph TD
     class S1,S2,S3 source
 ```
 
-## 📊 Data Model
-
-### Star Schema Design
-
-Our data model follows a classic retail star schema pattern with comprehensive dimensions and facts:
-
-```mermaid
-erDiagram
-    dim_dates {
-        date date_id PK
-        varchar month
-        varchar day_of_week
-        varchar season
-        varchar shopping_season
-        varchar quarter_name
-        boolean is_weekend
-    }
-    
-    dim_customers {
-        int customer_id PK
-        varchar customer_name
-        varchar email
-        varchar value_segment
-        varchar activity_status
-        varchar region
-        decimal lifetime_revenue
-        int total_orders
-    }
-    
-    dim_products {
-        int product_id PK
-        varchar product_name
-        varchar category
-        varchar category_group
-        varchar price_tier
-        varchar product_status
-        decimal retail_price
-        decimal margin_percent
-    }
-    
-    dim_employees {
-        int employee_id PK
-        varchar employee_name
-        varchar department
-        varchar tenure_category
-        varchar performance_tier
-        varchar job_title
-        int manager_id
-    }
-    
-    dim_stores {
-        int store_id PK
-        varchar store_name
-        varchar store_type
-        varchar region
-        varchar operating_status
-        decimal monthly_target
-        varchar performance_status
-    }
-    
-    dim_suppliers {
-        int supplier_id PK
-        varchar supplier_name
-        varchar supplier_tier
-        varchar region
-        int total_products
-        varchar portfolio_diversity
-    }
-    
-    fct_orders {
-        int order_id PK
-        date order_date FK
-        int customer_id FK
-        int employee_id FK
-        int store_id FK
-        varchar status_desc
-        decimal revenue
-        int item_count
-        int total_quantity
-    }
-
-    %% Relationships
-    dim_dates ||--o{ fct_orders : order_date
-    dim_customers ||--o{ fct_orders : customer_id
-    dim_employees ||--o{ fct_orders : employee_id
-    dim_stores ||--o{ fct_orders : store_id
-    dim_suppliers ||--o{ dim_products : supplier_id
-    dim_products ||--o{ fct_orders : "via order_items"
-    dim_employees ||--o{ dim_employees : "reports_to"
-```
-
 ### 🥇 Gold Layer (Marts)
 
 #### Main Dimensions
@@ -483,10 +392,6 @@ To visualize lineage in Databricks:
 3. Use **Lineage** tab for dependency visualization
 4. Leverage **Query Profile** for performance analysis
 
-<<<<<<< HEAD
----
-*Built with ❤️ using dbt and Databricks*
-=======
 ### Project Structure
 
 ```
@@ -557,5 +462,49 @@ dbt compile --select analyses
 # View compiled results in target/compiled/dbt_demo/analyses/
 ```
 
+## 🎯 Next Steps
+
+### Suggested Improvements
+
+- [ ] **Incremental Models**: Implement incremental loading for `fct_orders`
+- [ ] **dbt Cloud**: Set up automated jobs
+- [ ] **Great Expectations**: Add advanced quality tests
+- [ ] **Snapshots**: Implement SCD Type 2 for changing dimensions
+- [ ] **Exposures**: Document dashboards and reports using the data
+
+### BI Tools Integration
+
+- **Power BI**: Connect directly to gold tables
+- **Looker**: Create LookML based on dimensions
+- **Databricks SQL**: Build native dashboards
+
+## 🤝 Contributing
+
+### Guidelines
+
+1. **Fork** the repository
+2. Create a **branch** for your feature: `git checkout -b feature/new-functionality`
+3. **Commit** your changes: `git commit -m 'Add: new functionality'`
+4. **Push** to the branch: `git push origin feature/new-functionality`
+5. Open a **Pull Request**
+
+### Code Standards
+
+- Use descriptive names for business models
+- Document all models and important columns
+- Include tests for critical validations
+- Follow SQL conventions (snake_case, indentation)
+
+---
+
+## 📞 Support
+
+Questions or issues?
+
+- 📧 **Email**: your-email@company.com
+- 📋 **Issues**: [GitHub Issues](https://github.com/your-user/dbt-databricks-analytics/issues)
+- 📖 **dbt Documentation**: [docs.getdbt.com](https://docs.getdbt.com)
+
+---
+
 *Built with ❤️ using dbt and Databricks*
->>>>>>> f77c376 (Update README)

@@ -39,42 +39,63 @@ This project demonstrates the implementation of a complete data warehouse for a 
 
 ```mermaid
 flowchart TD
-    A[Data Sources] --> B[🥉 Bronze Layer<br/>Raw Data]
-    B --> C[🥈 Silver Layer<br/>Staging Models]
-    C --> D[🥇 Gold Layer<br/>Data Marts]
-    
-    subgraph Bronze [" Bronze - Raw Data "]
-        B1[customers]
-        B2[orders] 
-        B3[order_items]
-        B4[products]
-        B5[employees]
-        B6[stores]
-        B7[suppliers]
-        B8[dates]
+    ---
+config:
+  theme: redux
+---
+graph TD
+    subgraph Sources ["📥 Data Sources"]
+        S1[Raw CSV Files]
+        S2[Database Extracts] 
+        S3[API Data]
     end
-    
-    subgraph Silver [" Silver - Cleaned Data "]
+    subgraph Bronze ["🥉 Bronze Layer - Raw Data"]
+        B1[(customers)]
+        B2[(orders)]
+        B3[(order_items)]
+        B4[(products)]
+        B5[(employees)]
+        B6[(stores)]
+        B7[(suppliers)]
+        B8[(dates)]
+    end
+    subgraph Silver ["🥈 Silver Layer - Cleaned Data"]
         C1[stg_customers]
         C2[stg_orders]
-        C3[stg_order_items] 
+        C3[stg_order_items]
         C4[stg_products]
         C5[stg_employees]
         C6[stg_stores]
         C7[stg_suppliers]
         C8[stg_dates]
     end
-    
-    subgraph Gold [" Gold - Business Ready "]
-        D1[dim_customers]
-        D2[dim_products]
-        D3[dim_employees]
-        D4[dim_stores]
-        D5[dim_suppliers]
-        D6[dim_dates]
-        D7[fct_orders]
-        D8[fct_customer_segmentation]
-        D9[fct_store_performance]
+    subgraph Gold ["🥇 Gold Layer - Business Ready"]
+        direction TB
+        subgraph Dimensions ["📊 Dimensions"]
+            D1[dim_customers]
+            D2[dim_products] 
+            D3[dim_employees]
+            D4[dim_stores]
+            D5[dim_suppliers]
+            D6[dim_dates]
+        end
+        subgraph Facts ["📈 Facts"]
+            F1[fct_orders]
+            F2[fct_customer_segmentation]
+            F3[fct_store_performance]
+        end
+    end
+    Sources --> Bronze
+    Bronze --> Silver
+    Silver --> Gold
+    classDef bronze fill:#cd853f,stroke:#8b4513,stroke-width:2px,color:#fff
+    classDef silver fill:#c0c0c0,stroke:#696969,stroke-width:2px,color:#000
+    classDef gold fill:#ffd700,stroke:#daa520,stroke-width:2px,color:#000
+    classDef source fill:#98fb98,stroke:#228b22,stroke-width:2px,color:#000
+    class B1,B2,B3,B4,B5,B6,B7,B8 bronze
+    class C1,C2,C3,C4,C5,C6,C7,C8 silver
+    class D1,D2,D3,D4,D5,D6,F1,F2,F3 gold
+    class S1,S2,S3 source
     end
 ```
 

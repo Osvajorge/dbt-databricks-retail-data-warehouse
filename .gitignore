@@ -6,6 +6,25 @@ dbt_modules/
 logs/
 dbt-venv/
 package-lock.yml
+
 # Sensitive configuration files
 profiles.yml
 .dbt/
+
+# Environment files
+.env
+profiles.yml
+
+# Development files
+*.log
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo

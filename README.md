@@ -1,4 +1,4 @@
-# 🛍️ dbt-Databricks Analytics - Retail Data Warehouse
+# 🛍️ dbt Demo - Retail Data Warehouse
 
 [![dbt](https://img.shields.io/badge/dbt-1.7+-orange.svg)](https://docs.getdbt.com)
 [![Databricks](https://img.shields.io/badge/Databricks-Compatible-red.svg)](https://databricks.com)
@@ -37,67 +37,15 @@ This project demonstrates the implementation of a complete data warehouse for a 
 
 ### Medallion Architecture Overview
 
-```mermaid
-graph TD
-    subgraph Sources ["📥 Data Sources"]
-        S1[Raw CSV Files]
-        S2[Database Extracts] 
-        S3[API Data]
-    end
-    
-    subgraph Bronze ["🥉 Bronze Layer - Raw Data"]
-        B1[(customers)]
-        B2[(orders)]
-        B3[(order_items)]
-        B4[(products)]
-        B5[(employees)]
-        B6[(stores)]
-        B7[(suppliers)]
-        B8[(dates)]
-    end
-    
-    subgraph Silver ["🥈 Silver Layer - Cleaned Data"]
-        C1[stg_customers]
-        C2[stg_orders]
-        C3[stg_order_items]
-        C4[stg_products]
-        C5[stg_employees]
-        C6[stg_stores]
-        C7[stg_suppliers]
-        C8[stg_dates]
-    end
-    
-    subgraph Gold ["🥇 Gold Layer - Business Ready"]
-        direction TB
-        subgraph Dimensions ["📊 Dimensions"]
-            D1[dim_customers]
-            D2[dim_products] 
-            D3[dim_employees]
-            D4[dim_stores]
-            D5[dim_suppliers]
-            D6[dim_dates]
-        end
-        subgraph Facts ["📈 Facts"]
-            F1[fct_orders]
-            F2[fct_customer_segmentation]
-            F3[fct_store_performance]
-        end
-    end
-    
-    Sources --> Bronze
-    Bronze --> Silver
-    Silver --> Gold
-    
-    classDef bronze fill:#cd853f,stroke:#8b4513,stroke-width:2px,color:#fff
-    classDef silver fill:#c0c0c0,stroke:#696969,stroke-width:2px,color:#000
-    classDef gold fill:#ffd700,stroke:#daa520,stroke-width:2px,color:#000
-    classDef source fill:#98fb98,stroke:#228b22,stroke-width:2px,color:#000
-    
-    class B1,B2,B3,B4,B5,B6,B7,B8 bronze
-    class C1,C2,C3,C4,C5,C6,C7,C8 silver
-    class D1,D2,D3,D4,D5,D6,F1,F2,F3 gold
-    class S1,S2,S3 source
-```
+![Medallion Architecture Flow](/images/medallion_architecture_flow.png)
+
+## 📊 Data Model
+
+### Star Schema Design
+
+The data model follows a classic retail star schema pattern with comprehensive dimensions and facts:
+
+![Star Schema Design](/images/star_schema_desing.png)
 
 ### 🥇 Gold Layer (Marts)
 
@@ -128,112 +76,7 @@ The following diagram shows the complete dbt lineage from bronze tables through 
 
 > **Note**: After running `dbt docs generate && dbt docs serve`, you can explore the interactive lineage graph at `http://localhost:8080`
 
-```mermaid
-flowchart LR
-    %% Bronze Layer
-    subgraph Bronze ["🥉 Bronze Tables"]
-        direction TB
-        customers[(customers)]
-        orders[(orders)]
-        order_items[(order_items)]
-        products[(products)]
-        employees[(employees)]
-        stores[(stores)]
-        suppliers[(suppliers)]
-        dates[(dates)]
-    end
-    
-    %% Seeds
-    subgraph Seeds ["🌱 Reference Data"]
-        direction TB
-        cs[customer_segments]
-        er[employee_roles] 
-        pc[product_categories]
-        st[store_targets]
-        osm[order_status_mapping]
-    end
-    
-    %% Silver Layer
-    subgraph Silver ["🥈 Staging Models"]
-        direction TB
-        stg_customers[stg_customers]
-        stg_orders[stg_orders]
-        stg_order_items[stg_order_items]
-        stg_products[stg_products]
-        stg_employees[stg_employees]
-        stg_stores[stg_stores]
-        stg_suppliers[stg_suppliers]
-        stg_dates[stg_dates]
-    end
-    
-    %% Gold Layer - Dimensions
-    subgraph Dimensions ["📊 Dimensions"]
-        direction TB
-        dim_customers[dim_customers]
-        dim_products[dim_products]
-        dim_employees[dim_employees]
-        dim_stores[dim_stores]
-        dim_suppliers[dim_suppliers]
-        dim_dates[dim_dates]
-    end
-    
-    %% Gold Layer - Facts
-    subgraph Facts ["📈 Fact Tables"]
-        direction TB
-        fct_orders[fct_orders]
-        fct_segmentation[fct_customer_segmentation]
-        fct_performance[fct_store_performance]
-        fct_profit[fct_store_monthly_profit]
-    end
-    
-    %% Connections Bronze to Silver
-    customers --> stg_customers
-    orders --> stg_orders
-    order_items --> stg_order_items
-    products --> stg_products
-    employees --> stg_employees
-    stores --> stg_stores
-    suppliers --> stg_suppliers
-    dates --> stg_dates
-    
-    %% Connections Silver to Gold Dimensions
-    stg_customers --> dim_customers
-    stg_products --> dim_products
-    stg_employees --> dim_employees
-    stg_stores --> dim_stores
-    stg_suppliers --> dim_suppliers
-    stg_dates --> dim_dates
-    
-    %% Seeds to Dimensions
-    cs --> dim_customers
-    er --> dim_employees
-    pc --> dim_products
-    st --> dim_stores
-    osm --> stg_orders
-    
-    %% Silver to Facts
-    stg_orders --> fct_orders
-    stg_order_items --> fct_orders
-    
-    %% Dimensions to Facts
-    dim_customers --> fct_segmentation
-    dim_stores --> fct_performance
-    dim_stores --> fct_profit
-    fct_orders --> fct_segmentation
-    fct_orders --> fct_performance
-    fct_orders --> fct_profit
-    
-    %% Styling
-    classDef bronze fill:#8B4513,stroke:#654321,stroke-width:2px,color:#fff
-    classDef silver fill:#A9A9A9,stroke:#696969,stroke-width:2px,color:#000
-    classDef gold fill:#FFD700,stroke:#B8860B,stroke-width:2px,color:#000
-    classDef seed fill:#90EE90,stroke:#32CD32,stroke-width:2px,color:#000
-    
-    class customers,orders,order_items,products,employees,stores,suppliers,dates bronze
-    class stg_customers,stg_orders,stg_order_items,stg_products,stg_employees,stg_stores,stg_suppliers,stg_dates silver
-    class dim_customers,dim_products,dim_employees,dim_stores,dim_suppliers,dim_dates,fct_orders,fct_segmentation,fct_performance,fct_profit gold
-    class cs,er,pc,st,osm seed
-```
+![Complete Data Flow](/images/complete_data_flow.png)
 
 ## 🚀 Setup & Installation
 

@@ -94,7 +94,7 @@ graph TD
     classDef source fill:#98fb98,stroke:#228b22,stroke-width:2px,color:#000
     
     class B1,B2,B3,B4,B5,B6,B7,B8 bronze
-    class C1,C2,C3,C4,C5,C6,C7,C8 silver  
+    class C1,C2,C3,C4,C5,C6,C7,C8 silver
     class D1,D2,D3,D4,D5,D6,F1,F2,F3 gold
     class S1,S2,S3 source
 ```

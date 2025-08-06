@@ -45,7 +45,7 @@ This project demonstrates the implementation of a complete data warehouse for a 
 
 The data model follows a classic retail star schema pattern with comprehensive dimensions and facts:
 
-![Star Schema Design](/images/star_schema_desing.png)
+![Star Schema Design](/images/star_schema_design.png)
 
 ### 🥇 Gold Layer (Marts)
 
